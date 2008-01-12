@@ -8,6 +8,7 @@ build_requires:
   FindBin: 0
   Test::Exception: 0
   Test::More: 0
+  Test::WWW::Mechanize: 0
 distribution_type: module
 generated_by: Module::Install version 0.68
 license: perl
@@ -28,7 +29,8 @@ requires:
   MooseX::AttributeHelpers: 0.06
   MooseX::Daemonize: 0.05
   MooseX::Getopt: 0.07
+  MooseX::Params::Validate: 0.04
   MooseX::Types::Path::Class: 0
   POSIX: 0
 tests: t/*.t
-version: 0.01
+version: 0.02
