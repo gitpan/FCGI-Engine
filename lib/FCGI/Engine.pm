@@ -1,4 +1,3 @@
-
 package FCGI::Engine;
 use Moose;
 
@@ -12,7 +11,7 @@ use FCGI::Engine::ProcManager;
 
 use constant DEBUG => 0;
 
-our $VERSION   = '0.03';
+our $VERSION   = '0.04';
 our $AUTHORITY = 'cpan:STEVAN';
 
 with 'MooseX::Getopt',
@@ -77,6 +76,15 @@ has 'handler_method' => (
     default   => sub { 'handler' },
 );
 
+has 'handler_args_builder' => (
+    metaclass => 'NoGetopt',
+    is        => 'ro',
+    isa       => 'CodeRef',
+    default   => sub { 
+        sub { CGI::Simple->new }
+    },
+);
+
 has 'pre_fork_init' => (
     metaclass => 'NoGetopt',
     is        => 'ro',
@@ -102,6 +110,7 @@ sub run {
 
     my $handler_class  = $self->handler_class;
     my $handler_method = $self->handler_method;
+    my $handler_args   = $self->handler_args_builder;
         
     Class::MOP::load_class($handler_class) unless blessed $handler_class;
 
@@ -164,7 +173,7 @@ sub run {
             $ENV{PATH_INFO} ||= delete $ENV{SCRIPT_NAME};
         }
 
-        $handler_class->$handler_method(CGI::Simple->new);
+        $handler_class->$handler_method( $handler_args->() );
 
         $proc_manager && $proc_manager->post_dispatch;
     }
@@ -203,6 +212,9 @@ FCGI::Engine - A flexible engine for running FCGI-based applications
   perl scripts/my_web_app_fcgi.pl --nproc 10 --pidfile /tmp/my_app.pid \
                                   --listen /tmp/my_app.socket --daemon
 
+  # see also FCGI::Engine::Manager for managing 
+  # multiple FastCGI backends under one script
+
 =head1 IMPORTANT NOTE
 
 This is an early release of this module, it is intended to fill the 
@@ -228,6 +240,30 @@ interface which is compatible with that module. But of course it
 does not require L<Catalyst> or anything L<Catalyst> related. So 
 you can use this module with your L<CGI::Application>-based web 
 application or any other L<Random::Web::Framework>-based web app.
+
+=head2 Using with Catalyst or other web frameworks
+
+This module (FCGI::Engine) is B<not> a replacement for L<Catalyst::Engine::FastCGI>
+but instead the L<FCGI::Engine::Manager> (and all it's configuration tools) can be 
+used to manager L<Catalyst> apps as well as FCGI::Engine based applications. For 
+example, at work we have an application which has 6 different FCGI backends running.
+Three of them use an ancient in-house web framework with simple FCGI::Engine wrappers, 
+one which uses L<CGI::Application> and an FCGI::Engine wrapper and then two L<Catalyst>
+applications. They all happily and peacefully coexist and are all managed with the 
+same L<FCGI::Engine::Manager> script.
+
+=head2 Note about CGI.pm usage
+
+This module uses L<CGI::Simple> as a sane replacement for CGI.pm, it will pass in
+a L<CGI::Simple> instance to your chosen C<handler_method> for you, so there is no 
+need to create your own instance of it. There have been a few cases from users who
+have had bad interactions with CGI.pm and the instance of L<CGI::Simple> we create
+for you, so before you spend hours looking for bugs in your app, check for this 
+first instead.
+
+If you want to change this behavior and not use L<CGI::Simple> then you can 
+override this using the C<handler_args_builder> option, see the docs on that 
+below for more details.
 
 =head1 CAVEAT
 
@@ -293,6 +329,12 @@ the request loop to dispatch your web application.
 This is the class method to be called on the I<handler_class>
 to server as a dispatch entry point to your web application. It
 will default to C<handler>.
+
+=item I<handler_args_builder>
+
+This must be a CODE ref that when called produces the arguments 
+to pass to the I<handler_method>. It defaults to a sub which 
+returns a L<CGI::Simple> object.
 
 =item I<pre_fork_init>
 
