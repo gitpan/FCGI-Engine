@@ -6,7 +6,7 @@ use FCGI::Engine::Manager::Server;
 
 use Config::Any;
 
-our $VERSION   = '0.02';
+our $VERSION   = '0.03';
 our $AUTHORITY = 'cpan:STEVAN';
 
 with 'MooseX::Getopt';
@@ -60,7 +60,9 @@ sub start {
     
     $self->log("Starting up the FCGI servers ...");
 
-    foreach my $server (@{$self->servers}) {
+    my @servers = (@_ && defined $_[0]) ? $self->_find_server_by_name( @_ ) : @{ $self->servers };
+
+    foreach my $server ( @servers ) {
     
         my @cli = $server->construct_command_line();
         $self->log("Running @cli");
@@ -94,14 +96,26 @@ sub start {
 }
 
 sub status {
-    # FIXME:
-    # there must be a better way to do this, 
-    # and even if there isn't we should come
-    # up with a better way to display them
-    # (oh yeah and filter out things not related
-    # to us as well)
-    # - SL
-    join "\n" => map { chomp; s/\s+$//; $_ } `ps auxwww | grep fcgi`;    
+    my $self = shift;
+    
+    my @servers = (@_ && defined $_[0]) ? $self->_find_server_by_name( @_ ) : @{ $self->servers };
+    
+    my $status = '';
+    foreach my $server ( @servers ) {
+    
+        $status .= $server->name;
+    
+        if (! -f $server->pidfile ) {
+            $status .= " is not running\n";
+            next;
+        }
+    
+        my $pid = $server->pid_obj;
+    
+        $status .= $pid->is_running ? " is running\n" : " is not running\n"
+    }
+    
+    return $status;    
 }
 
 sub stop {
@@ -111,7 +125,9 @@ sub stop {
         
     $self->log("Killing the FCGI servers ...");
 
-    foreach my $server (@{$self->servers}) {
+    my @servers = (@_ && defined $_[0]) ? $self->_find_server_by_name( @_ ) : @{ $self->servers };
+
+    foreach my $server ( @servers ) {
     
         if (-f $server->pidfile) {
             
@@ -123,7 +139,9 @@ sub stop {
             while ($pid->is_running) {
                 $self->log("pid (" . $server->pidfile . ") is still running, sleeping ...");
                 sleep 1;
-            }                       
+            } 
+            
+            $server->remove_pid_obj;
         }
     
         if (-e $server->socket) {
@@ -133,6 +151,22 @@ sub stop {
     }    
 
     $self->log("... FCGI servers have been killed");
+}
+
+sub restart {
+    my $self = shift;
+    $self->stop( @_ );
+    sleep( 2 ); # give stop() some time
+    $self->start( @_ );
+}
+
+sub _find_server_by_name {
+    my( $self, @names ) = @_;
+
+    my %wanted = map { $_ => 1 } @names;
+    my @servers = grep { exists $wanted{ $_->name } } @{ $self->servers };
+
+    return @servers;
 }
 
 1;
@@ -154,14 +188,18 @@ FCGI::Engine::Manager - Manage multiple FCGI::Engine instances
       conf => 'conf/my_app_conf.yml'
   );
   
-  $m->start  if $ARGV[0] eq 'start';
-  $m->status if $ARGV[0] eq 'status';
-  $m->stop   if $ARGV[0] eq 'stop';    
+  my ($command, $server_name) = @ARGV;
+  
+  $m->start($server_name)        if $command eq 'start';
+  $m->stop($server_name)         if $command eq 'stop';  
+  $m->restart($server_name)      if $command eq 'restart';
+  print $m->status($server_name) if $command eq 'status';     
 
   # on the command line
   
   perl all_my_fcgi_backends.pl start
   perl all_my_fcgi_backends.pl stop
+  perl all_my_fcgi_backends.pl restart foo.server  
   # etc ...  
 
 =head1 DESCRIPTION

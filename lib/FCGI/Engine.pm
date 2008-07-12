@@ -11,7 +11,7 @@ use FCGI::Engine::ProcManager;
 
 use constant DEBUG => 0;
 
-our $VERSION   = '0.04';
+our $VERSION   = '0.05';
 our $AUTHORITY = 'cpan:STEVAN';
 
 with 'MooseX::Getopt',
@@ -457,6 +457,12 @@ to cpan-RT.
 =head1 AUTHOR
 
 Stevan Little E<lt>stevan@iinteractive.comE<gt>
+
+Contributions from:
+
+Bradley C. Bailey
+
+Brian Cassidy
 
 =head1 COPYRIGHT AND LICENSE
 
