@@ -32,4 +32,4 @@ requires:
   MooseX::Params::Validate: 0.04
   MooseX::Types::Path::Class: 0
   POSIX: 0
-version: 0.05
+version: 0.06
