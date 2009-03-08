@@ -1,4 +1,4 @@
-FCGI-Engine version 0.07
+FCGI-Engine version 0.08
 ===========================
 
 See the individual module documentation for more information
@@ -21,7 +21,6 @@ This module requires these other modules and libraries:
     MooseX::Daemonize
     MooseX::Getopt
     MooseX::Types::Path::Class
-    MooseX::Params::Validate
     Declare::Constraints::Simple
     FCGI
     CGI::Simple

@@ -10,7 +10,7 @@ build_requires:
   Test::More: 0
   Test::WWW::Mechanize: 0
 distribution_type: module
-generated_by: 'Module::Install version 0.75'
+generated_by: 'Module::Install version 0.71'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.3.html
@@ -29,7 +29,7 @@ requires:
   MooseX::AttributeHelpers: 0.06
   MooseX::Daemonize: 0.06
   MooseX::Getopt: 0.14
-  MooseX::Params::Validate: 0.04
   MooseX::Types::Path::Class: 0
   POSIX: 0
-version: 0.07
+tests: t/*.t
+version: 0.08

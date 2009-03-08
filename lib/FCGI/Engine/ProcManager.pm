@@ -1,6 +1,5 @@
 package FCGI::Engine::ProcManager;
 use Moose;
-use MooseX::Params::Validate;
 use MooseX::AttributeHelpers;
 
 use constant DEBUG => 0;
@@ -10,7 +9,7 @@ use POSIX qw(SA_RESTART SIGTERM SIGHUP);
 use FCGI::Engine::Types;
 use MooseX::Daemonize::Pid::File;
 
-our $VERSION   = '0.07'; 
+our $VERSION   = '0.08'; 
 our $AUTHORITY = 'cpan:STEVAN';
 
 has 'role' => (
@@ -302,11 +301,10 @@ sub wait : method {
 ## signal handling stuff ...
 
 sub setup_signal_actions {
-    my ($self, $with_sa_restart) = validatep(\@_, 
-        with_sa_restart => { isa => 'Bool' }
-    );
+    my $self = shift;
+    my %args = @_;
 
-    my $sig_action = $with_sa_restart 
+    my $sig_action = (exists $args{with_sa_restart} && $args{with_sa_restart}) 
         ? $self->sigaction_sa_restart
         : $self->sigaction_no_sa_restart;
         
