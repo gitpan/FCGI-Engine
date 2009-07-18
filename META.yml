@@ -32,4 +32,4 @@ requires:
   MooseX::Types::Path::Class: 0
   POSIX: 0
 tests: t/*.t
-version: 0.08
+version: 0.09
