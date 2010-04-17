@@ -16,6 +16,8 @@ lib/FCGI/Engine/Manager/Server/Plackup.pm
 lib/FCGI/Engine/ProcManager.pm
 lib/FCGI/Engine/PSGI.pm
 lib/FCGI/Engine/Types.pm
+lib/Plack/Handler/FCGI/Engine.pm
+lib/Plack/Handler/FCGI/Engine/ProcManager.pm
 lib/Plack/Server/FCGI/Engine.pm
 lib/Plack/Server/FCGI/Engine/ProcManager.pm
 Makefile.PL
