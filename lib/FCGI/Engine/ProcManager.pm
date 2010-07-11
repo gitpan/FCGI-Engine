@@ -8,7 +8,7 @@ use POSIX qw(SA_RESTART SIGTERM SIGHUP);
 use FCGI::Engine::Types;
 use MooseX::Daemonize::Pid::File;
 
-our $VERSION   = '0.15';
+our $VERSION   = '0.16';
 our $AUTHORITY = 'cpan:STEVAN';
 
 has 'role' => (
@@ -291,7 +291,7 @@ sub wait : method {
     my $self = shift;
 
     # wait for the next server to die.
-    next if (my $pid = CORE::wait()) < 0;
+    return if (my $pid = CORE::wait()) < 0;
 
     # notify when one of our servers have died.
     $self->remove_pid($pid)
