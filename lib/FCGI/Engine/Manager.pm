@@ -6,7 +6,7 @@ use FCGI::Engine::Manager::Server;
 
 use Config::Any;
 
-our $VERSION   = '0.17';
+our $VERSION   = '0.18';
 our $AUTHORITY = 'cpan:STEVAN';
 
 with 'MooseX::Getopt';
@@ -284,7 +284,7 @@ application.
     nproc:            1
     pidfile:         "/tmp/baz.pid"
     socket:          "/tmp/baz.socket"
-    additional_args: [ "-e", "production" ] # plackup specific option
+    additional_args: [ "-E", "production" ] # plackup specific option
 
 =head1 BUGS
 

@@ -1,7 +1,7 @@
 package FCGI::Engine::Manager::Server::Plackup;
 use Moose;
 
-our $VERSION   = '0.17';
+our $VERSION   = '0.18';
 our $AUTHORITY = 'cpan:STEVAN';
 
 extends 'FCGI::Engine::Manager::Server';
@@ -12,20 +12,23 @@ has 'server_type' => (
     default  => sub { 'FCGI::Engine' }
 );
 
+has 'workers' => (
+    is       => 'ro',
+    isa      => 'Int'
+);
+
 sub construct_command_line {
     my $self = shift;
     return ("plackup",
          $self->scriptname,
          "--server",
          $self->server_type,
-         "--nproc",
-         $self->nproc,
-         "--pidfile",
+         ( $self->workers ? ( "--workers", $self->workers ) : ( "--nproc", $self->nproc ) ),
+         "--pid",
          $self->pidfile,
          "--listen",
          $self->socket,
-         "--detach",
-         1,
+         "--daemonize",
          ($self->has_additional_args
              ? $self->additional_args
              : ()));
