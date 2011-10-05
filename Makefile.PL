@@ -2,8 +2,10 @@ use strict;
 use warnings;
 use inc::Module::Install;
 
-die "This module is not for use on Windows, sorry."
-    if  $^O eq 'Win32' or $^O eq 'cygwin';
+if ($^O eq 'Win32' or $^O eq 'cygwin') {
+    print STDERR "This module is not for use on Windows, sorry.";
+    exit 0;
+}
 
 name 'FCGI-Engine';
 all_from 'lib/FCGI/Engine.pm';
@@ -24,11 +26,11 @@ feature 'Plack Support',
   -default           => 0,
   'MooseX::NonMoose' => 0.07,
   'Plack'            => 0.9910,
-  'FCGI::Client'     => 0.04, # for the tests
+  'FCGI::Client'     => 0.06, # for the tests
   'IO::String'       => 0;    # for the tests
 
 # things the tests need
-build_requires 'Test::More';
+build_requires 'Test::More' => '0.88';
 build_requires 'Test::Exception';
 build_requires 'Test::WWW::Mechanize';
 build_requires 'File::Spec';
@@ -36,6 +38,10 @@ build_requires 'FindBin';
 build_requires 'Cwd';
 
 tests('t/*.t');
+
+resources(
+    'repository', => 'git://github.com/bobtfish/fcgi-engine.git',
+);
 
 WriteAll();
 

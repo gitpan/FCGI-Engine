@@ -14,6 +14,7 @@ lib/FCGI/Engine/Manager/Server.pm
 lib/FCGI/Engine/Manager/Server/FreeBSD6.pm
 lib/FCGI/Engine/Manager/Server/Plackup.pm
 lib/FCGI/Engine/ProcManager.pm
+lib/FCGI/Engine/ProcManager/Constrained.pm
 lib/FCGI/Engine/PSGI.pm
 lib/FCGI/Engine/Types.pm
 lib/Plack/Handler/FCGI/Engine.pm
