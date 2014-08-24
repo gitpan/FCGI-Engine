@@ -5,7 +5,7 @@ use Declare::Constraints::Simple '-All';
 use MooseX::Getopt::OptionTypeMap;
 use MooseX::Types::Path::Class;
 
-our $VERSION   = '0.21';
+our $VERSION   = '0.22';
 our $AUTHORITY = 'cpan:STEVAN';
 
 ## FCGI::Engine
@@ -60,7 +60,7 @@ subtype 'FCGI::Engine::Manager::Config'
 
 ## FCGI::Engine::ProcManager
 
-enum 'FCGI::Engine::ProcManager::Role' => qw[manager server];
+enum 'FCGI::Engine::ProcManager::Role' => [ qw[manager server] ];
 
 1;
 

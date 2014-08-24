@@ -1,6 +1,7 @@
 package FCGI::Engine::Core;
 use Moose;
 
+use Class::Load ();
 use FCGI;
 use MooseX::Daemonize::Pid::File;
 use FCGI::Engine::Types;
@@ -8,7 +9,7 @@ use FCGI::Engine::ProcManager;
 
 use constant DEBUG => 0;
 
-our $VERSION   = '0.21';
+our $VERSION   = '0.22';
 our $AUTHORITY = 'cpan:STEVAN';
 
 with 'MooseX::Getopt',
@@ -121,7 +122,7 @@ sub create_proc_manager {
     my ( $self, %addtional_options ) = @_;
 
     # make sure any subclasses are loaded ...
-    Class::MOP::load_class( $self->manager );
+    Class::Load::load_class( $self->manager );
 
     return $self->manager->new({
         n_processes => $self->nproc,
@@ -194,7 +195,8 @@ sub run {
         $proc_manager && $proc_manager->pre_dispatch;
 
         $self->handle_request(
-            $self->prepare_environment( $env )
+            $self->prepare_environment( $env ),
+            $request
         );
 
         $proc_manager && $proc_manager->post_dispatch;
